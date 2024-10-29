@@ -102,4 +102,18 @@ bbva-web-link {
     font-size: medium;
   }
 }
+
+.row {
+  display: flex;
+  align-items: center;
+}
+
+figure {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: 0.5em;
+  gap: 8px;
+}
 `;
