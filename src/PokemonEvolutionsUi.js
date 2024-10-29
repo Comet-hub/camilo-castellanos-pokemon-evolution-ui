@@ -7,20 +7,7 @@ import { bbvaAdvance } from '@bbva-web-components/bbva-foundations-icons';
 import { bbvaBackmini } from '@bbva-web-components/bbva-foundations-icons';
 import '@bbva-web-components/bbva-core-icon/bbva-core-icon.js';
 import '@bbva-web-components/bbva-web-link';
-
-/**
- * ![LitElement component](https://img.shields.io/badge/litElement-component-blue.svg)
- *
- * This component ...
- *
- * Example:
- *
- * ```html
- *   <pokemon-evolutions-ui></pokemon-evolutions-ui>
- * ```
- */
-
-// Example objects
+import '@pokedex/pokemon-evolution-dm/pokemon-evolution-dm.js';
 
 const applin = {
   id: 840,
@@ -64,15 +51,28 @@ export class PokemonEvolutionsUi extends LitElement {
       chain: {
         type: Object,
       },
+      pokemonChain: {
+        type: Object,
+      },
     };
   }
 
   constructor() {
     super();
+    this.pokemonChain = {};
     this.arrowIcon = advanceIcon;
     this.backIcon = backMiniIcon;
     this.pokemon = oddish;
     this.searchEvolutions();
+  }
+
+  async firstUpdated() {
+    this.pokemonEvolutionDm = this.shadowRoot.querySelector(
+      'pokemon-evolution-dm',
+    );
+    this.pokemonChain = await this.pokemonEvolutionDm.searchForEvolutions(
+      this.chain.chain,
+    );
   }
 
   static get styles() {
@@ -102,7 +102,7 @@ export class PokemonEvolutionsUi extends LitElement {
           <bbva-core-heading level="4">Evolution Chain</bbva-core-heading>
           <div class="evolutions-container">
             <div class="column">
-              <p>${this.chain.chain.species.name.toUpperCase()}</p>
+              <p>${this.pokemonChain.name}</p>
             </div>
             <div class="column">
               ${this.chain.chain.evolves_to.map(
@@ -129,7 +129,6 @@ export class PokemonEvolutionsUi extends LitElement {
                                       icon="${this.arrowIcon}"
                                     ></bbva-core-icon>
                                     ${secondFase.species.name.toUpperCase()}
-                                    ${console.log(secondFase)}
                                   </p>
                                 </div>
                               </div>`,
@@ -142,6 +141,7 @@ export class PokemonEvolutionsUi extends LitElement {
           </div>
         </div>
       </div>
+      <pokemon-evolution-dm></pokemon-evolution-dm>
     `;
   }
 

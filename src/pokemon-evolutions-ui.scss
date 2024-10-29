@@ -76,10 +76,24 @@ bbva-web-link {
     0px 0px 15px rgba(0, 0, 0, 0.03),
     0px 2px 30px rgba(0, 0, 0, 0.08),
     0px 0px 1px rgba(0, 0, 0, 0.03);
-  padding: 1rem;
+  padding: 0.85rem;
+  margin: 2rem 0.5rem;
+}
+
+.evolution-tree {
+  p {
+    font-size: x-small;
+
+    @media screen and (min-width: 375px) {
+      font-size: medium;
+    }
+  }
 }
 
 .arrow {
-  margin: 0.5rem;
   color: lightgrey;
+
+  @media screen and (min-width: 600px) {
+    font-size: medium;
+  }
 }
