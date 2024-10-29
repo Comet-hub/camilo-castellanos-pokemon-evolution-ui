@@ -4,52 +4,20 @@ import styles from './pokemon-evolutions-ui.css.js';
 
 import '@bbva-web-components/bbva-core-heading/bbva-core-heading.js';
 import { bbvaAdvance } from '@bbva-web-components/bbva-foundations-icons';
-import { bbvaBackmini } from '@bbva-web-components/bbva-foundations-icons';
 import '@bbva-web-components/bbva-core-icon/bbva-core-icon.js';
-import '@bbva-web-components/bbva-web-link';
 import '@pokedex/pokemon-evolution-dm/pokemon-evolution-dm.js';
 
-const applin = {
-  id: 840,
-  img: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/840.png',
-  name: 'Applin',
-  evolutionChain: 'https://pokeapi.co/api/v2/evolution-chain/442/',
-};
-
-const jolteon = {
-  id: 135,
-  img: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/135.png',
-  name: 'Jolteon',
-  evolutionChain: 'https://pokeapi.co/api/v2/evolution-chain/67/',
-};
-
-const oddish = {
-  id: 43,
-  img: 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/43.png',
-  name: 'oddish',
-  evolutionChain: 'https://pokeapi.co/api/v2/evolution-chain/18/',
-};
-
 const advanceIcon = bbvaAdvance();
-const backMiniIcon = bbvaBackmini();
 
 export class PokemonEvolutionsUi extends LitElement {
   static get properties() {
     return {
-      /**
-       * Description for property
-       */
       pokemon: {
         type: Object,
       },
       arrowIcon: {
         type: String,
-      },
-      backIcon: {
-        type: String,
-      },
-      chain: {
-        type: Object,
+        attribute: false,
       },
       pokemonChain: {
         type: Object,
@@ -61,9 +29,7 @@ export class PokemonEvolutionsUi extends LitElement {
     super();
     this.pokemonChain = {};
     this.arrowIcon = advanceIcon;
-    this.backIcon = backMiniIcon;
-    this.pokemon = oddish;
-    this.searchEvolutions();
+    this.pokemon = {};
   }
 
   async firstUpdated() {
@@ -71,8 +37,16 @@ export class PokemonEvolutionsUi extends LitElement {
       'pokemon-evolution-dm',
     );
     this.pokemonChain = await this.pokemonEvolutionDm.searchForEvolutions(
-      this.chain.chain,
+      this.pokemon.evolution.chain,
     );
+  }
+
+  async updated(changedProperties) {
+    if (changedProperties.has('pokemon')) {
+      this.pokemonChain = await this.pokemonEvolutionDm.searchForEvolutions(
+        this.pokemon.evolution.chain,
+      );
+    }
   }
 
   static get styles() {
@@ -84,38 +58,58 @@ export class PokemonEvolutionsUi extends LitElement {
 
   render() {
     return html`
-      <bbva-web-link @click=${(e) => console.log('home-page')}>
-        <bbva-core-icon icon="${this.backIcon}"></bbva-core-icon>
-        BACK
-      </bbva-web-link>
       <bbva-core-heading level="1"
-        >Evolutions of ${this.pokemon.name}</bbva-core-heading
+        ><slot name="main-title"></slot> ${this.pokemon.name}</bbva-core-heading
       >
       <div class="container">
         <img
-          src="${this.pokemon.img}"
+          src="${this.pokemon.sprites.other.home.front_default}"
           alt="${this.pokemon.name}"
           height="200"
           width="200"
         />
         <div class="evolution-tree">
-          <bbva-core-heading level="4">Evolution Chain</bbva-core-heading>
+          <bbva-core-heading level="4"
+            ><slot name="chain-title"></slot
+          ></bbva-core-heading>
           <div class="evolutions-container">
             <div class="column">
-              <p>${this.pokemonChain.name}</p>
+              <span class="row">
+                <figure>
+                  <img
+                    src="${this.pokemonChain.sprites?.other.home.front_default}"
+                    alt="${this.pokemonChain.name}"
+                    width="64"
+                    height="64"
+                  />
+                  <figcaption>
+                    ${this.pokemonChain.name?.toUpperCase()}
+                  </figcaption>
+                </figure>
+              </span>
             </div>
             <div class="column">
-              ${this.chain.chain.evolves_to.map(
+              ${this.pokemonChain.evolves_to?.map(
                 (firstFase) =>
                   html`<div class="evolutions-container">
                     <div class="column">
-                      <p>
+                      <span class="row">
                         <bbva-core-icon
                           class="arrow"
                           icon="${this.arrowIcon}"
                         ></bbva-core-icon>
-                        ${firstFase.species.name.toUpperCase()}
-                      </p>
+                        <figure>
+                          <img
+                            src="${firstFase.sprites.other.home.front_default}"
+                            alt="${firstFase.name}"
+                            width="64"
+                            height="64"
+                          />
+                          <figcaption>
+                            ${firstFase.name.toUpperCase()}
+                          </figcaption>
+                        </figure>
+                      </span>
                     </div>
                     <div class="column">
                       ${firstFase.evolves_to.length
@@ -123,13 +117,24 @@ export class PokemonEvolutionsUi extends LitElement {
                             (secondFase) =>
                               html`<div class="evolution-container">
                                 <div class="column">
-                                  <p>
+                                  <span class="row">
                                     <bbva-core-icon
                                       class="arrow"
                                       icon="${this.arrowIcon}"
                                     ></bbva-core-icon>
-                                    ${secondFase.species.name.toUpperCase()}
-                                  </p>
+                                    <figure>
+                                      <img
+                                        src="${secondFase.sprites.other.home
+                                          .front_default}"
+                                        alt="${secondFase.name}"
+                                        width="64"
+                                        height="64"
+                                      />
+                                      <figcaption>
+                                        ${secondFase.name.toUpperCase()}
+                                      </figcaption>
+                                    </figure>
+                                  </span>
                                 </div>
                               </div>`,
                           )
@@ -141,13 +146,8 @@ export class PokemonEvolutionsUi extends LitElement {
           </div>
         </div>
       </div>
+
       <pokemon-evolution-dm></pokemon-evolution-dm>
     `;
-  }
-
-  searchEvolutions() {
-    fetch(this.pokemon.evolutionChain)
-      .then((res) => res.json())
-      .then((data) => (this.chain = data));
   }
 }
